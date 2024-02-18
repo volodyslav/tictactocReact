@@ -14,23 +14,51 @@ const App = () => {
     {id: 8, value: ""},
     {id: 9, value: ""},
   ]
+  
   const [player, setPlayer] = useState("X")
+  const [playerStop, setPlayerStop] = useState(true)
+
   const [enemy, setEnemy] = useState("")
   const [children, setChildren] = useState(initialValues)
 
+  const randomValue = () => {
+    const ra = Math.floor(Math.random() * initialValues.length) + 1
+    console.log(ra)
+    return ra
+  }
+  const enemyMove = () => {
+    setChildren(s => {
+      return s.map(child => {
+      let random = randomValue()
+      if (child.id === random && child.value === ""){
+        return {...child, value: enemy}
+      }
+      return child
+    })
+  })
+  }
+
   const handleChange = (id) => {
+    console.log(id)
+    
       setChildren(s => {
         return s.map(child => {
-        if (child.id === id){
+        if (child.id === id && child.value === "" && playerStop){
+          setPlayerStop(false)
           return {...child, value: player}
         }
         return child
       })
     })
+    setTimeout(() => {
+      enemyMove()
+      setPlayerStop(true)
+    }, 2000)
   }
 
   useEffect(() => {
     setEnemy(player === "X" ? "O" : "X")
+    
   }, [])
 
   console.log("P", player)

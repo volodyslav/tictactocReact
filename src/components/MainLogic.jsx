@@ -1,7 +1,7 @@
 import { useEffect, useState} from "react"
 import Square from "./Square"
 
-const MainLogic = () => {
+const MainLogic = ({player, enemy, chosen, handleChoosePlayer}) => {
   // Squares' values
   const initialValues = [
     {id: 0, value: ""},
@@ -18,33 +18,46 @@ const MainLogic = () => {
   // Check game start stop
   const [game, setGame] = useState(true)
 
-  const [player, setPlayer] = useState("X")
+  //Player can play 
+  
   const [playerStop, setPlayerStop] = useState(true)
-
-  const [enemy, setEnemy] = useState("")
   const [children, setChildren] = useState(initialValues)
 
+  const resetAll = () => {
+    setChildren(initialValues)
+    setGame(true)
+  }
+
   const randomValue = () => {
-    return  Math.floor(Math.random() * initialValues.length) 
+    return  Math.floor(Math.random() * children.length) 
   }
   const enemyMove = () => {
     let random = randomValue();
-    
-    while(children[random]["value"] === 'X' || children[random]["value"] === 'O'){
+    let startDate = Date.now()
+    while(children[random]["value"] === 'X' || children[random]["value"] === 'O' && game){
       random = randomValue();
+      // If values all taken do search 5ms
+      if(Date.now() - startDate > 500){
+        break
+      }
       console.log(random)
     }
+    if(children[random]["value"] === "" && game){
       setChildren(prevChildren => {
         const newChildren = [...prevChildren]
         newChildren[random]["value"] = enemy
+        setPlayerStop(true)
         return newChildren
       })
+    }else{
+      return 
+    }
+    
     }
   
-
     const gameOver = (value) => {
         console.log(`win ${value}`)
-        setPlayerStop(false)
+        setPlayerStop(true)
         setGame(false)
         return 
     }
@@ -79,46 +92,47 @@ const MainLogic = () => {
         gameOver(children[2]["value"])
      
     }
-
   }
  
 
   const handleChange = (id) => {
       setChildren(s => {
         return s.map(child => {
-        if (child.id === id && child.value === "" && game){
+        if (child.id === id && child.value === "" && game && playerStop){
+          setPlayerStop(false)
           return {...child, value: player}
         }
         return child
       })
     })
-   
-    setTimeout(() => {
-        if(game){
-            enemyMove() 
-        }
-        
-    }, 2000) 
-
-    console.log(game)
+  
   }
 
   useEffect(() => {
     
-    setEnemy(player === "X" ? "O" : "X")  
+    
     handleWin()
+    if(game && !playerStop){
+      enemyMove() 
+  }
     console.log(children)
-  }, [children, game])
+    console.log("Player", playerStop)
+    console.log("Game", game)
+  }, [children, game, playerStop])
 
   return (
     <div>
-      <div id="parentDiv" className=" bg-slate-900 p-4 text-white grid grid-cols-3 border-4 border-slate-950 rounded-xl min-w-40 mx-auto min-h-16">
-        {children.map(child => (
+        <div className=" grid grid-cols-3">
+        {chosen && children.map(child => (
           <Square key={child.id} value={child.value} onClick={() => handleChange(child.id) && game}></Square>
         ))}
-        
-      </div>
-      <button className="my-4 bg-red-800 text-white p-2 rounded-lg hover:bg-red-600 focus:bg-red-600">Reset</button>
+        {chosen && <button onClick={() => resetAll()} className="my-4 bg-red-800 text-white p-2 rounded-lg hover:bg-red-600 focus:bg-red-600">Reset</button>}
+        </div>
+        {!chosen && <div className=" text-center  space-y-4 items-center my-20 mx-auto space-x-4">
+          <h1 className=" text-6xl">Choose player 1</h1>
+          <button value="O" className=' p-4 text-white rounded-lg bg-green-500 ' onClick={() => handleChoosePlayer("O")}>O</button>
+          <button value="X" className=' p-4 text-white rounded-lg bg-blue-500 ' onClick={() => handleChoosePlayer("X")} >X</button>
+        </div>}
     </div>
   )
 }

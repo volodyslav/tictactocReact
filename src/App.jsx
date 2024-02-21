@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import MainLogic from './components/MainLogic'
 
+
 const App = () => {
 
   // Choose player
@@ -14,6 +15,17 @@ const App = () => {
 
   //Chose X or O
   const [chosen, setChosen] = useState(false)
+
+
+  //Reset ++ all
+  const handleResetAll = () => {
+    setEnemy("")
+    setPlayer("")
+    setPlayer2("")
+    setPlayWith("")
+    setPlay(false)
+    setChosen(false)
+  }
 
   useEffect(() => {
     setEnemy(player === "X" ? "O" : "X")
@@ -33,7 +45,7 @@ const App = () => {
   return (
     <div>
       <div id="parentDiv" className=" z-50 shadow-2xl bg-slate-900 p-6 text-white  border-4 border-slate-950 rounded-xl  mx-auto ">
-          <MainLogic player={player} handlePlayWith={handlePlayWith} play={play} playWith={playWith} enemy={enemy} chosen={chosen} handleChoosePlayer={handleChoosePlayer} player2={player2}></MainLogic>
+          <MainLogic player={player} handleResetAll={handleResetAll} handlePlayWith={handlePlayWith} play={play} playWith={playWith} enemy={enemy} chosen={chosen} handleChoosePlayer={handleChoosePlayer} player2={player2}></MainLogic>
       </div>
       
     </div>
